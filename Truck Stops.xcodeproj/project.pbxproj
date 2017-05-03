@@ -1,0 +1,336 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D428D53D1EB971D300EFB043 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D53C1EB971D300EFB043 /* main.m */; };
+		D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D53F1EB971D300EFB043 /* AppDelegate.m */; };
+		D428D5431EB971D300EFB043 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D5421EB971D300EFB043 /* ViewController.m */; };
+		D428D5461EB971D300EFB043 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D428D5441EB971D300EFB043 /* Main.storyboard */; };
+		D428D5491EB971D300EFB043 /* Truck_Stops.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */; };
+		D428D54B1EB971D300EFB043 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D428D54A1EB971D300EFB043 /* Assets.xcassets */; };
+		D428D54E1EB971D300EFB043 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D428D5381EB971D300EFB043 /* Truck Stops.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Truck Stops.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D428D53C1EB971D300EFB043 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D428D53E1EB971D300EFB043 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		D428D53F1EB971D300EFB043 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		D428D5411EB971D300EFB043 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		D428D5421EB971D300EFB043 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		D428D5451EB971D300EFB043 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Truck_Stops.xcdatamodel; sourceTree = "<group>"; };
+		D428D54A1EB971D300EFB043 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D428D54D1EB971D300EFB043 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D428D54F1EB971D300EFB043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D428D5351EB971D300EFB043 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D428D52F1EB971D300EFB043 = {
+			isa = PBXGroup;
+			children = (
+				D428D53A1EB971D300EFB043 /* Truck Stops */,
+				D428D5391EB971D300EFB043 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D428D5391EB971D300EFB043 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D428D5381EB971D300EFB043 /* Truck Stops.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D428D53A1EB971D300EFB043 /* Truck Stops */ = {
+			isa = PBXGroup;
+			children = (
+				D428D53E1EB971D300EFB043 /* AppDelegate.h */,
+				D428D53F1EB971D300EFB043 /* AppDelegate.m */,
+				D428D5411EB971D300EFB043 /* ViewController.h */,
+				D428D5421EB971D300EFB043 /* ViewController.m */,
+				D428D5441EB971D300EFB043 /* Main.storyboard */,
+				D428D54A1EB971D300EFB043 /* Assets.xcassets */,
+				D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */,
+				D428D54F1EB971D300EFB043 /* Info.plist */,
+				D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */,
+				D428D53B1EB971D300EFB043 /* Supporting Files */,
+			);
+			path = "Truck Stops";
+			sourceTree = "<group>";
+		};
+		D428D53B1EB971D300EFB043 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D428D53C1EB971D300EFB043 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D428D5371EB971D300EFB043 /* Truck Stops */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D428D5521EB971D300EFB043 /* Build configuration list for PBXNativeTarget "Truck Stops" */;
+			buildPhases = (
+				D428D5341EB971D300EFB043 /* Sources */,
+				D428D5351EB971D300EFB043 /* Frameworks */,
+				D428D5361EB971D300EFB043 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Truck Stops";
+			productName = "Truck Stops";
+			productReference = D428D5381EB971D300EFB043 /* Truck Stops.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D428D5301EB971D300EFB043 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Joey deVilla";
+				TargetAttributes = {
+					D428D5371EB971D300EFB043 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = EFL9LXPU8S;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D428D5331EB971D300EFB043 /* Build configuration list for PBXProject "Truck Stops" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D428D52F1EB971D300EFB043;
+			productRefGroup = D428D5391EB971D300EFB043 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D428D5371EB971D300EFB043 /* Truck Stops */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D428D5361EB971D300EFB043 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D428D54E1EB971D300EFB043 /* LaunchScreen.storyboard in Resources */,
+				D428D54B1EB971D300EFB043 /* Assets.xcassets in Resources */,
+				D428D5461EB971D300EFB043 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D428D5341EB971D300EFB043 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D428D5431EB971D300EFB043 /* ViewController.m in Sources */,
+				D428D5491EB971D300EFB043 /* Truck_Stops.xcdatamodeld in Sources */,
+				D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */,
+				D428D53D1EB971D300EFB043 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D428D5441EB971D300EFB043 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D428D5451EB971D300EFB043 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D428D54D1EB971D300EFB043 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D428D5501EB971D300EFB043 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		D428D5511EB971D300EFB043 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D428D5531EB971D300EFB043 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = EFL9LXPU8S;
+				INFOPLIST_FILE = "Truck Stops/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.joeydevilla.Truck-Stops";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D428D5541EB971D300EFB043 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = EFL9LXPU8S;
+				INFOPLIST_FILE = "Truck Stops/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.joeydevilla.Truck-Stops";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D428D5331EB971D300EFB043 /* Build configuration list for PBXProject "Truck Stops" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D428D5501EB971D300EFB043 /* Debug */,
+				D428D5511EB971D300EFB043 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D428D5521EB971D300EFB043 /* Build configuration list for PBXNativeTarget "Truck Stops" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D428D5531EB971D300EFB043 /* Debug */,
+				D428D5541EB971D300EFB043 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */,
+			);
+			currentVersion = D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */;
+			path = Truck_Stops.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = D428D5301EB971D300EFB043 /* Project object */;
+}
