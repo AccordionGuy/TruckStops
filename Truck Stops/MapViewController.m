@@ -6,13 +6,18 @@
 //  Copyright © 2017 Joey deVilla. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "MapViewController.h"
+#import <MapKit/MapKit.h>
 
-@interface ViewController ()
+
+@interface MapViewController ()
+
+@property (weak, nonatomic) IBOutlet MKMapView *mapView;
 
 @end
 
-@implementation ViewController
+
+@implementation MapViewController
 
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -24,6 +29,5 @@
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
 }
-
 
 @end

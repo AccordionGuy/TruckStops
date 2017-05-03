@@ -9,11 +9,13 @@
 /* Begin PBXBuildFile section */
 		D428D53D1EB971D300EFB043 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D53C1EB971D300EFB043 /* main.m */; };
 		D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D53F1EB971D300EFB043 /* AppDelegate.m */; };
-		D428D5431EB971D300EFB043 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D5421EB971D300EFB043 /* ViewController.m */; };
+		D428D5431EB971D300EFB043 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D5421EB971D300EFB043 /* MapViewController.m */; };
 		D428D5461EB971D300EFB043 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D428D5441EB971D300EFB043 /* Main.storyboard */; };
 		D428D5491EB971D300EFB043 /* Truck_Stops.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */; };
 		D428D54B1EB971D300EFB043 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D428D54A1EB971D300EFB043 /* Assets.xcassets */; };
 		D428D54E1EB971D300EFB043 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */; };
+		D428D5571EB972A900EFB043 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D428D5561EB972A900EFB043 /* CoreLocation.framework */; };
+		D428D5591EB972C100EFB043 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D428D5581EB972C100EFB043 /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,13 +23,15 @@
 		D428D53C1EB971D300EFB043 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D428D53E1EB971D300EFB043 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D428D53F1EB971D300EFB043 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		D428D5411EB971D300EFB043 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		D428D5421EB971D300EFB043 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		D428D5411EB971D300EFB043 /* MapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
+		D428D5421EB971D300EFB043 /* MapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
 		D428D5451EB971D300EFB043 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Truck_Stops.xcdatamodel; sourceTree = "<group>"; };
 		D428D54A1EB971D300EFB043 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D428D54D1EB971D300EFB043 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D428D54F1EB971D300EFB043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D428D5561EB972A900EFB043 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		D428D5581EB972C100EFB043 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +39,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D428D5591EB972C100EFB043 /* MapKit.framework in Frameworks */,
+				D428D5571EB972A900EFB043 /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +52,7 @@
 			children = (
 				D428D53A1EB971D300EFB043 /* Truck Stops */,
 				D428D5391EB971D300EFB043 /* Products */,
+				D428D5551EB972A900EFB043 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -62,8 +69,8 @@
 			children = (
 				D428D53E1EB971D300EFB043 /* AppDelegate.h */,
 				D428D53F1EB971D300EFB043 /* AppDelegate.m */,
-				D428D5411EB971D300EFB043 /* ViewController.h */,
-				D428D5421EB971D300EFB043 /* ViewController.m */,
+				D428D5411EB971D300EFB043 /* MapViewController.h */,
+				D428D5421EB971D300EFB043 /* MapViewController.m */,
 				D428D5441EB971D300EFB043 /* Main.storyboard */,
 				D428D54A1EB971D300EFB043 /* Assets.xcassets */,
 				D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */,
@@ -80,6 +87,15 @@
 				D428D53C1EB971D300EFB043 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D428D5551EB972A900EFB043 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D428D5581EB972C100EFB043 /* MapKit.framework */,
+				D428D5561EB972A900EFB043 /* CoreLocation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -154,7 +170,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D428D5431EB971D300EFB043 /* ViewController.m in Sources */,
+				D428D5431EB971D300EFB043 /* MapViewController.m in Sources */,
 				D428D5491EB971D300EFB043 /* Truck_Stops.xcdatamodeld in Sources */,
 				D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */,
 				D428D53D1EB971D300EFB043 /* main.m in Sources */,
