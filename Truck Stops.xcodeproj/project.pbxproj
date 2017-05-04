@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ACFB95C4B0C88D836F9019AD /* Pods_Truck_Stops.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 618C1FD4BEB32E120132420A /* Pods_Truck_Stops.framework */; };
 		D428D53D1EB971D300EFB043 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D53C1EB971D300EFB043 /* main.m */; };
 		D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D53F1EB971D300EFB043 /* AppDelegate.m */; };
 		D428D5431EB971D300EFB043 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D5421EB971D300EFB043 /* MapViewController.m */; };
 		D428D5461EB971D300EFB043 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D428D5441EB971D300EFB043 /* Main.storyboard */; };
-		D428D5491EB971D300EFB043 /* Truck_Stops.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */; };
 		D428D54B1EB971D300EFB043 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D428D54A1EB971D300EFB043 /* Assets.xcassets */; };
 		D428D54E1EB971D300EFB043 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */; };
 		D428D5571EB972A900EFB043 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D428D5561EB972A900EFB043 /* CoreLocation.framework */; };
@@ -19,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		618C1FD4BEB32E120132420A /* Pods_Truck_Stops.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Truck_Stops.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C45F9E2BD65557F584B960B3 /* Pods-Truck Stops.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Truck Stops.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Truck Stops/Pods-Truck Stops.debug.xcconfig"; sourceTree = "<group>"; };
 		D428D5381EB971D300EFB043 /* Truck Stops.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Truck Stops.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D428D53C1EB971D300EFB043 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D428D53E1EB971D300EFB043 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -26,12 +28,12 @@
 		D428D5411EB971D300EFB043 /* MapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
 		D428D5421EB971D300EFB043 /* MapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
 		D428D5451EB971D300EFB043 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Truck_Stops.xcdatamodel; sourceTree = "<group>"; };
 		D428D54A1EB971D300EFB043 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D428D54D1EB971D300EFB043 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D428D54F1EB971D300EFB043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D428D5561EB972A900EFB043 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		D428D5581EB972C100EFB043 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		F8633173E122F93B819589E5 /* Pods-Truck Stops.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Truck Stops.release.xcconfig"; path = "Pods/Target Support Files/Pods-Truck Stops/Pods-Truck Stops.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,18 +43,29 @@
 			files = (
 				D428D5591EB972C100EFB043 /* MapKit.framework in Frameworks */,
 				D428D5571EB972A900EFB043 /* CoreLocation.framework in Frameworks */,
+				ACFB95C4B0C88D836F9019AD /* Pods_Truck_Stops.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8FBAA5511B3419065A2F96BE /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C45F9E2BD65557F584B960B3 /* Pods-Truck Stops.debug.xcconfig */,
+				F8633173E122F93B819589E5 /* Pods-Truck Stops.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		D428D52F1EB971D300EFB043 = {
 			isa = PBXGroup;
 			children = (
 				D428D53A1EB971D300EFB043 /* Truck Stops */,
 				D428D5391EB971D300EFB043 /* Products */,
 				D428D5551EB972A900EFB043 /* Frameworks */,
+				8FBAA5511B3419065A2F96BE /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -75,7 +88,6 @@
 				D428D54A1EB971D300EFB043 /* Assets.xcassets */,
 				D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */,
 				D428D54F1EB971D300EFB043 /* Info.plist */,
-				D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */,
 				D428D53B1EB971D300EFB043 /* Supporting Files */,
 			);
 			path = "Truck Stops";
@@ -94,6 +106,7 @@
 			children = (
 				D428D5581EB972C100EFB043 /* MapKit.framework */,
 				D428D5561EB972A900EFB043 /* CoreLocation.framework */,
+				618C1FD4BEB32E120132420A /* Pods_Truck_Stops.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -105,9 +118,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D428D5521EB971D300EFB043 /* Build configuration list for PBXNativeTarget "Truck Stops" */;
 			buildPhases = (
+				5B1A5A4001E5F223DCAB6F80 /* [CP] Check Pods Manifest.lock */,
 				D428D5341EB971D300EFB043 /* Sources */,
 				D428D5351EB971D300EFB043 /* Frameworks */,
 				D428D5361EB971D300EFB043 /* Resources */,
+				B2112358D32C33EA5CD1D592 /* [CP] Embed Pods Frameworks */,
+				C1F195CAA369CC4834BA9152 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -165,13 +181,60 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		5B1A5A4001E5F223DCAB6F80 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B2112358D32C33EA5CD1D592 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Truck Stops/Pods-Truck Stops-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C1F195CAA369CC4834BA9152 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Truck Stops/Pods-Truck Stops-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D428D5341EB971D300EFB043 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				D428D5431EB971D300EFB043 /* MapViewController.m in Sources */,
-				D428D5491EB971D300EFB043 /* Truck_Stops.xcdatamodeld in Sources */,
 				D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */,
 				D428D53D1EB971D300EFB043 /* main.m in Sources */,
 			);
@@ -291,10 +354,12 @@
 		};
 		D428D5531EB971D300EFB043 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C45F9E2BD65557F584B960B3 /* Pods-Truck Stops.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = EFL9LXPU8S;
 				INFOPLIST_FILE = "Truck Stops/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.joeydevilla.Truck-Stops";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -303,10 +368,12 @@
 		};
 		D428D5541EB971D300EFB043 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F8633173E122F93B819589E5 /* Pods-Truck Stops.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = EFL9LXPU8S;
 				INFOPLIST_FILE = "Truck Stops/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.joeydevilla.Truck-Stops";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -334,19 +401,6 @@
 			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		D428D5471EB971D300EFB043 /* Truck_Stops.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */,
-			);
-			currentVersion = D428D5481EB971D300EFB043 /* Truck_Stops.xcdatamodel */;
-			path = Truck_Stops.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = D428D5301EB971D300EFB043 /* Project object */;
 }

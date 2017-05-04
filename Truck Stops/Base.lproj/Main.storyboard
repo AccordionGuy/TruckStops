@@ -6,13 +6,14 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Map View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="MapViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -24,18 +25,48 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nL1-ks-aut">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                             </mapView>
+                            <segmentedControl contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="FWr-rL-RnN">
+                                <rect key="frame" x="16" y="619" width="141" height="29"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <segments>
+                                    <segment title="Standard"/>
+                                    <segment title="Satellite"/>
+                                </segments>
+                                <connections>
+                                    <action selector="userChangedMapView:" destination="BYZ-38-t0r" eventType="valueChanged" id="zgN-VU-brv"/>
+                                </connections>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A3S-dh-svW">
+                                <rect key="frame" x="254" y="620" width="105" height="28"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="13"/>
+                                <state key="normal" title=" Current location ">
+                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="currentLocationButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="iC4-iC-rLZ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="A3S-dh-svW" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="31x-mI-aKX"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="A3S-dh-svW" secondAttribute="bottom" constant="19" id="MK1-SD-RcZ"/>
+                            <constraint firstItem="FWr-rL-RnN" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="MMi-rd-jTJ"/>
                             <constraint firstItem="nL1-ks-aut" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Xvg-tB-0Ly"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="FWr-rL-RnN" secondAttribute="bottom" constant="20" id="gDp-ii-teR"/>
                             <constraint firstAttribute="trailing" secondItem="nL1-ks-aut" secondAttribute="trailing" id="jSJ-qt-MCh"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="nL1-ks-aut" secondAttribute="bottom" id="uV0-X8-4o7"/>
                             <constraint firstItem="nL1-ks-aut" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="vyn-Y5-pU2"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="Qtk-cE-Ntt"/>
+                    <navigationItem key="navigationItem" id="Qtk-cE-Ntt">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="sTB-CI-0b8"/>
+                    </navigationItem>
                     <connections>
+                        <outlet property="currentLocationButton" destination="A3S-dh-svW" id="zfB-F8-cPT"/>
                         <outlet property="mapView" destination="nL1-ks-aut" id="itI-mF-AFa"/>
+                        <outlet property="viewSelector" destination="FWr-rL-RnN" id="maK-tw-hs2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
