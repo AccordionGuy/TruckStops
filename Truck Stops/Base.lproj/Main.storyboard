@@ -22,7 +22,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nL1-ks-aut">
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" rotateEnabled="NO" pitchEnabled="NO" showsUserLocation="YES" showsScale="YES" showsTraffic="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nL1-ks-aut">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                             </mapView>
                             <segmentedControl contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="FWr-rL-RnN">
@@ -47,12 +47,17 @@
                                     <action selector="currentLocationButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="iC4-iC-rLZ"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="fz3-BY-tdM">
+                                <rect key="frame" x="178" y="323.5" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="A3S-dh-svW" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="31x-mI-aKX"/>
+                            <constraint firstItem="fz3-BY-tdM" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4OG-eb-ePR"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="A3S-dh-svW" secondAttribute="bottom" constant="19" id="MK1-SD-RcZ"/>
                             <constraint firstItem="FWr-rL-RnN" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="MMi-rd-jTJ"/>
+                            <constraint firstItem="fz3-BY-tdM" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Qs8-gm-7Qm"/>
                             <constraint firstItem="nL1-ks-aut" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Xvg-tB-0Ly"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="FWr-rL-RnN" secondAttribute="bottom" constant="20" id="gDp-ii-teR"/>
                             <constraint firstAttribute="trailing" secondItem="nL1-ks-aut" secondAttribute="trailing" id="jSJ-qt-MCh"/>
@@ -64,6 +69,7 @@
                         <barButtonItem key="rightBarButtonItem" title="Item" id="sTB-CI-0b8"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="activityIndicator" destination="fz3-BY-tdM" id="2T5-Dm-rUn"/>
                         <outlet property="currentLocationButton" destination="A3S-dh-svW" id="zfB-F8-cPT"/>
                         <outlet property="mapView" destination="nL1-ks-aut" id="itI-mF-AFa"/>
                         <outlet property="viewSelector" destination="FWr-rL-RnN" id="maK-tw-hs2"/>
