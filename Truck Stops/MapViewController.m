@@ -31,6 +31,9 @@ const int METERS_PER_MILE = 1609.34;
   CLLocationManager *locationManager;
 
   CLLocation *currentLocation;
+  MKCoordinateRegion lastKnownRegion;
+  CLLocationCoordinate2D lastKnownCenterCoordinate;
+
 
   TrackingMode currentTrackingMode;
 
@@ -41,9 +44,19 @@ const int METERS_PER_MILE = 1609.34;
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  locationManager = [[CLLocationManager alloc] init];
+  locationManager.delegate = self;
+  // Check for iOS 8. Without this guard the code will crash with "unknown selector" on iOS 7.
+  if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+    [locationManager requestWhenInUseAuthorization];
+  }
+  locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+  [locationManager startUpdatingLocation];
+
   self.mapView.delegate = self;
   [self.mapView setUserTrackingMode:MKUserTrackingModeFollow];
   self.mapView.showsTraffic = YES;
+  self.mapView.showsUserLocation = YES;
 
   // Initialize segmented control
   self.viewSelector.layer.cornerRadius = 7.0;
@@ -62,15 +75,6 @@ const int METERS_PER_MILE = 1609.34;
   currentTrackingMode = kTrackingOn;
 
   userIsReadingDetails = NO;
-
-  locationManager = [[CLLocationManager alloc] init];
-  locationManager.delegate = self;
-  // Check for iOS 8. Without this guard the code will crash with "unknown selector" on iOS 7.
-  if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
-    [locationManager requestWhenInUseAuthorization];
-  }
-  locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-  [locationManager startUpdatingLocation];
 
   [self displayCurrentLocationAtDefaultZoom];
 }
@@ -95,28 +99,21 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (IBAction)currentLocationButtonTapped:(UIButton *)sender {
-  [locationManager startUpdatingLocation];
-
-  // [self displayCurrentLocationAtDefaultZoom];
-  float largestMapViewSpan;
-  if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
-  {
-    largestMapViewSpan = metersToMiles([self mapViewLatitudeInMeters:self.mapView]);
-  } else {
-    largestMapViewSpan = metersToMiles([self mapViewLongitudeInMeters:self.mapView]);
-  }
-  NSLog(@"largestMapViewSpan: %f", largestMapViewSpan);
-  [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
-                       andLongitude:currentLocation.coordinate.longitude
-                         withRadius:largestMapViewSpan];
+  [self displayCurrentLocationAtDefaultZoom];
+//  int radius = 100;
+//  [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
+//                       andLongitude:currentLocation.coordinate.longitude
+//                  withRadiusInMiles:radius];
 }
 
 - (void)getTruckStopDataForLatitude:(double)latitude
                        andLongitude:(double)longitude
-                         withRadius:(double)radiusInMiles{
+                  withRadiusInMiles:(int)radius {
+  if (latitude == 0.0 && longitude == 0.0) {
+    return;
+  }
+
   [self.activityIndicator startAnimating];
-  NSLog(@"getTruckStopDataForLatitude:%f\nandLongitude:%f\nwithRadius:%f",
-        latitude, longitude, radiusInMiles);
 
   NSDictionary *headers = @{
     @"Content-Type": @"application/json",
@@ -130,13 +127,7 @@ const int METERS_PER_MILE = 1609.34;
     @"lat": formattedLat,
     @"lng": formattedLng
   };
-//  NSDictionary *parameters = @{
-//                               @"lat": [NSNumber numberWithDouble:latitude],
-//                               @"lng": [NSNumber numberWithDouble:longitude]
-//                               };
-
-  int radiusTrunc = (int)radiusInMiles;
-  NSString *urlString = [NSString stringWithFormat:@"http://webapp.transflodev.com/svc1.transflomobile.com/api/v3/stations/%d", radiusTrunc];
+  NSString *urlString = [NSString stringWithFormat:@"http://webapp.transflodev.com/svc1.transflomobile.com/api/v3/stations/%d", radius];
   NSLog(@"urlString: %@", urlString);
 
   [[UNIRest post:^(UNISimpleRequest *request) {
@@ -163,7 +154,8 @@ const int METERS_PER_MILE = 1609.34;
                                                                        [truckStop[@"lng"] doubleValue]);
         TruckStopAnnotation *point = [[TruckStopAnnotation alloc] initWithTitle:title
                                                                        Location:coordinate];
-        point.subtitle = [NSString stringWithFormat:@"%@", truckStop[@"city"]];
+        point.subtitle = [NSString stringWithFormat:@"%@, %@", truckStop[@"city"], truckStop[@"state"]];
+        point.address = [NSString stringWithFormat:@"%@\n%@", truckStop[@"rawLine1"], truckStop[@"rawLine2"]];
         [self.mapView addAnnotation:point];
       }
     }
@@ -180,14 +172,30 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (void)displayCurrentLocationAtDefaultZoom {
-  const double DEFAULT_MAP_SIZE = 100;
+  NSLog(@"displayCurrentLocationAtDefaultZoom");
+  CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
+                                                                 currentLocation.coordinate.longitude);
+  MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 160000, 160000)];
+  [self.mapView setRegion:adjustedRegion animated:YES];
+  int radius = 100;
+  [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
+                       andLongitude:currentLocation.coordinate.longitude
+                  withRadiusInMiles:radius];
 
-  MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(currentLocation.coordinate, milesToMeters(DEFAULT_MAP_SIZE), milesToMeters(DEFAULT_MAP_SIZE));
-  [self.mapView setRegion:region animated:YES];
+//  const double DEFAULT_MAP_SIZE = 200;
+//
+//  CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
+//                                                                       currentLocation.coordinate.longitude);
+//  self.mapView.camera.altitude = 160000;
+//  [self.mapView setCenterCoordinate:centerCoordinate animated:YES];
+//  MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(currentLocation.coordinate, milesToMeters(DEFAULT_MAP_SIZE), milesToMeters(DEFAULT_MAP_SIZE));
+//  [self.mapView setRegion:region animated:YES];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
   NSLog(@"Touches began");
+  lastKnownRegion = self.mapView.region;
+
   if (currentTrackingMode == kTrackingOn) {
     currentTrackingMode = kTrackingTemporarilyOff;
   }
@@ -204,21 +212,42 @@ const int METERS_PER_MILE = 1609.34;
 #pragma mark - MKMapViewDelegate
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
-  if (mapView.camera.altitude > 1000000.0) {
-    mapView.camera.altitude = 999999.0;
-  }
 }
 
 // Map position or zoom level changed
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-  NSLog(@"mapView:regionDidChangeAnimated:");
-    if (mapView.camera.altitude > 1000000.0) {
-      mapView.camera.altitude = 999999.0;
+  NSLog(@"regionDidChangeAnimated");
+
+  // Zoom limit for map
+  const double MAXIMUM_CAMERA_ALTITUDE = 1500000.0; // Make the map about 200 miles wide in portrait,
+                                                    // and 350 miles wide in landscape.
+  const double CAMERA_ZOOM_THRESHOLD_ALTITUDE = MAXIMUM_CAMERA_ALTITUDE + 1000;
+
+  if (mapView.camera.altitude > CAMERA_ZOOM_THRESHOLD_ALTITUDE) {
+    NSLog(@"Rezooming camera");
+    mapView.camera.altitude = MAXIMUM_CAMERA_ALTITUDE;
+  }
+
+  // Limit user to the United States and Canada
+  const double NORTHERNMOST_LATITUDE = 72.0;    // Northern edge of Alaska
+  const double SOUTHERNMOST_LATITUDE = 24.0;    // Key West
+  const double WESTERNMOST_LONGITUDE = -179.0;  // Aleutian islands
+  const double EASTERNMOST_LONGITUDE = -50.0;   // Newfoundland
+
+  if ((mapView.centerCoordinate.latitude  > NORTHERNMOST_LATITUDE) ||
+      (mapView.centerCoordinate.latitude  < SOUTHERNMOST_LATITUDE) ||
+      (mapView.centerCoordinate.longitude < WESTERNMOST_LONGITUDE) ||
+      (mapView.centerCoordinate.longitude > EASTERNMOST_LONGITUDE)) {
+    NSLog(@"Repositioning camera");
+    if (lastKnownCenterCoordinate.latitude != 0.0 && lastKnownCenterCoordinate.longitude != 0.0) {
+      [mapView setRegion:lastKnownRegion animated:YES];
+    } else {
+      return;
     }
+  }
 
   float largestMapViewSpan;
-  if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation))
-  {
+  if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) {
     largestMapViewSpan = metersToMiles([self mapViewLatitudeInMeters:mapView]);
   } else {
     largestMapViewSpan = metersToMiles([self mapViewLongitudeInMeters:mapView]);
@@ -226,10 +255,10 @@ const int METERS_PER_MILE = 1609.34;
   if (largestMapViewSpan < 1.0) {
     largestMapViewSpan = 1.0;
   }
-  NSLog(@"largestMapViewSpan: %f", largestMapViewSpan);
+  int radius = (int)round(largestMapViewSpan);
   [self getTruckStopDataForLatitude:mapView.centerCoordinate.latitude
                        andLongitude:mapView.centerCoordinate.longitude
-                         withRadius:largestMapViewSpan];
+                  withRadiusInMiles:radius];
 
   if (currentTrackingMode == kTrackingTemporarilyOff) {
     [self performSelector:@selector(centerMap) withObject:self afterDelay:5];
@@ -263,21 +292,6 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
-//  MKAnnotationView *pin = (MKAnnotationView *) [self.mapView dequeueReusableAnnotationViewWithIdentifier: @"Pin"];
-//  if (pin == nil)
-//  {
-//    pin = [[MKAnnotationView alloc] initWithAnnotation: annotation reuseIdentifier: @"Pin"] ;
-//  }
-//  else
-//  {
-//    pin.annotation = annotation;
-//  }
-//
-//  [pin setImage:[UIImage imageNamed:@"truck pin.png"]];
-//  pin.canShowCallout = YES;
-//  pin.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-//  return pin;
-
   if ([annotation isKindOfClass:[TruckStopAnnotation class]]) {
     TruckStopAnnotation *truckStopAnnotation = (TruckStopAnnotation *)annotation;
     MKAnnotationView *annotationView = [mapView dequeueReusableAnnotationViewWithIdentifier:@"TruckStopAnnotation"];
@@ -286,6 +300,29 @@ const int METERS_PER_MILE = 1609.34;
     } else {
       annotationView.annotation = annotation;
     }
+    [annotationView setImage:[UIImage imageNamed:@"truck pin"]];
+
+    CLLocationCoordinate2D annotationCoordinate = annotationView.annotation.coordinate;
+    CLLocation *annotationLocation = [[CLLocation alloc] initWithLatitude:annotationCoordinate.latitude
+                                                                longitude:annotationCoordinate.longitude];
+    int distance = (int)round(metersToMiles([currentLocation distanceFromLocation:annotationLocation]));
+
+    UILabel *detailLabel;
+    detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 60)];
+    [detailLabel setFont:[UIFont systemFontOfSize:14.0]];
+    detailLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    detailLabel.numberOfLines = 0;
+    detailLabel.text = [NSString stringWithFormat:@"%@\n%@", truckStopAnnotation.subtitle, truckStopAnnotation.address];
+    annotationView.detailCalloutAccessoryView = detailLabel;
+
+    UILabel *rightLabel;
+    rightLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 60)];
+    [rightLabel setFont:[UIFont systemFontOfSize:12.0]];
+    rightLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    rightLabel.numberOfLines = 0;
+    rightLabel.text = [NSString stringWithFormat:@"%d miles away", distance];
+    annotationView.rightCalloutAccessoryView = rightLabel;
+
     return annotationView;
   }
   else {
@@ -298,6 +335,14 @@ const int METERS_PER_MILE = 1609.34;
     [annotationView setImage:[UIImage imageNamed:@"user pin"]];
     annotationView.canShowCallout = YES;
     return annotationView;
+  }
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
+  id<MKAnnotation> annotation = view.annotation;
+  if ([annotation isKindOfClass:[TruckStopAnnotation class]]) {
+    TruckStopAnnotation *truckStopAnnotation = (TruckStopAnnotation *)annotation;
+    NSLog(@"TAPPED! %@", truckStopAnnotation.title);
   }
 }
 
