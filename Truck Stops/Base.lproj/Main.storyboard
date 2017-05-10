@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Map View Controller-->
+        <!--Map-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="MapViewController" sceneMemberID="viewController">
@@ -65,8 +65,9 @@
                             <constraint firstItem="nL1-ks-aut" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="vyn-Y5-pU2"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="Qtk-cE-Ntt">
-                        <barButtonItem key="rightBarButtonItem" title="Item" id="sTB-CI-0b8"/>
+                    <navigationItem key="navigationItem" title="Map" id="Qtk-cE-Ntt">
+                        <barButtonItem key="leftBarButtonItem" title="Tracking off" id="RcH-in-JgV"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="search" id="sTB-CI-0b8"/>
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="fz3-BY-tdM" id="2T5-Dm-rUn"/>

@@ -158,23 +158,27 @@ const int METERS_PER_MILE = 1609.34;
 
     if (numTruckStops > 0) {
       NSLog(@"Adding annotations");
-      for (NSDictionary *truckStop in truckStops) {
-        NSString *title = [NSString stringWithFormat:@"%@", truckStop[@"name"]];
-        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([truckStop[@"lat"] doubleValue],
-                                                                       [truckStop[@"lng"] doubleValue]);
-        TruckStopAnnotation *point = [[TruckStopAnnotation alloc] initWithTitle:title
-                                                                       Location:coordinate];
-        point.subtitle = [NSString stringWithFormat:@"%@, %@", truckStop[@"city"], truckStop[@"state"]];
-        point.address = [NSString stringWithFormat:@"%@\n%@", truckStop[@"rawLine1"], truckStop[@"rawLine2"]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-          [self.mapView addAnnotation:point];
-        });
-
-      }
+      [self addTruckStops:truckStops toMapView:self.mapView];
     }
   }];
 
   [self.activityIndicator stopAnimating];
+}
+
+- (void)addTruckStops:(NSArray *)truckStops toMapView:(MKMapView *)mapView {
+  NSLog(@"Adding annotations");
+  for (NSDictionary *truckStop in truckStops) {
+    NSString *title = [NSString stringWithFormat:@"%@", truckStop[@"name"]];
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([truckStop[@"lat"] doubleValue],
+                                                                   [truckStop[@"lng"] doubleValue]);
+    TruckStopAnnotation *point = [[TruckStopAnnotation alloc] initWithTitle:title
+                                                                   Location:coordinate];
+    point.subtitle = [NSString stringWithFormat:@"%@, %@", truckStop[@"city"], truckStop[@"state"]];
+    point.address = [NSString stringWithFormat:@"%@\n%@", truckStop[@"rawLine1"], truckStop[@"rawLine2"]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [mapView addAnnotation:point];
+    });
+  }
 }
 
 - (void)getCurrentLocation {
@@ -328,12 +332,32 @@ const int METERS_PER_MILE = 1609.34;
     } else {
       annotationView.annotation = annotation;
     }
-    [annotationView setImage:[UIImage imageNamed:@"truck pin"]];
+
+    NSString *name = annotation.title;
+    NSString *baseName;
+    if ([name hasPrefix:@"Pilot"]) {
+      baseName = @"pilot";
+    } else if ([name hasPrefix:@"Flying J"]) {
+      baseName = @"flying j";
+    } else if ([name hasPrefix:@"Love"]) {
+      baseName = @"loves";
+    } else if ([name hasPrefix:@"Travel"]) {
+      baseName = @"travel centers";
+    } else {
+      baseName = @"truck";
+    }
+    NSString *pinImageName = [NSString stringWithFormat:@"%@ pin", baseName];
+    [annotationView setImage:[UIImage imageNamed:pinImageName]];
 
     CLLocationCoordinate2D annotationCoordinate = annotationView.annotation.coordinate;
     CLLocation *annotationLocation = [[CLLocation alloc] initWithLatitude:annotationCoordinate.latitude
                                                                 longitude:annotationCoordinate.longitude];
     int distance = (int)round(metersToMiles([currentLocation distanceFromLocation:annotationLocation]));
+
+    UIImageView *detailImageView;
+    NSString *logoName = [NSString stringWithFormat:@"%@ logo", baseName];
+    detailImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:logoName]];
+    annotationView.leftCalloutAccessoryView = detailImageView;
 
     UILabel *detailLabel;
     detailLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 60)];
@@ -367,11 +391,11 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
-  id<MKAnnotation> annotation = view.annotation;
-  if ([annotation isKindOfClass:[TruckStopAnnotation class]]) {
-    TruckStopAnnotation *truckStopAnnotation = (TruckStopAnnotation *)annotation;
-    NSLog(@"TAPPED! %@", truckStopAnnotation.title);
-  }
+//  id<MKAnnotation> annotation = view.annotation;
+//  if ([annotation isKindOfClass:[TruckStopAnnotation class]]) {
+//    TruckStopAnnotation *truckStopAnnotation = (TruckStopAnnotation *)annotation;
+//    NSLog(@"TAPPED! %@", truckStopAnnotation.title);
+//  }
 }
 
 
@@ -410,6 +434,9 @@ const int METERS_PER_MILE = 1609.34;
   currentLocation = locations.lastObject;
   if (firstRun) {
     [self centerMapOnCurrentLocation];
+    [self getTruckStopDataForLatitude:currentLocation.coordinate.longitude
+                         andLongitude:currentLocation.coordinate.latitude
+                    withRadiusInMiles:100.0];
     firstRun = NO;
   }
 }
