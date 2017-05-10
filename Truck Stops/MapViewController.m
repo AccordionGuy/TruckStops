@@ -34,29 +34,30 @@ const int METERS_PER_MILE = 1609.34;
   MKCoordinateRegion lastKnownRegion;
   CLLocationCoordinate2D lastKnownCenterCoordinate;
 
-
   TrackingMode currentTrackingMode;
 
   bool isInTrackingMode;
   bool userIsReadingDetails;
+
+  BOOL firstRun;
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  NSLog(@"ViewDidLoad");
+
+  firstRun = true;
+  [self testInternetConnection];
+
   locationManager = [[CLLocationManager alloc] init];
   locationManager.delegate = self;
-  // Check for iOS 8. Without this guard the code will crash with "unknown selector" on iOS 7.
-  if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
-    [locationManager requestWhenInUseAuthorization];
-  }
+  [self checkLocationAuthorizationStatus];
   locationManager.desiredAccuracy = kCLLocationAccuracyBest;
   [locationManager startUpdatingLocation];
 
   self.mapView.delegate = self;
-  [self.mapView setUserTrackingMode:MKUserTrackingModeFollow];
   self.mapView.showsTraffic = YES;
-  self.mapView.showsUserLocation = YES;
 
   // Initialize segmented control
   self.viewSelector.layer.cornerRadius = 7.0;
@@ -66,8 +67,9 @@ const int METERS_PER_MILE = 1609.34;
 
   // Initialize current location button
   self.currentLocationButton.layer.cornerRadius = 7.0;
-  self.viewSelector.layer.borderWidth = 2.0f;
-  self.viewSelector.layer.masksToBounds = YES;
+  self.currentLocationButton.layer.borderColor = [UIColor whiteColor].CGColor;
+  self.currentLocationButton.layer.borderWidth = 4.0f;
+  self.currentLocationButton.layer.masksToBounds = YES;
 
   [self.activityIndicator stopAnimating];
 
@@ -76,7 +78,7 @@ const int METERS_PER_MILE = 1609.34;
 
   userIsReadingDetails = NO;
 
-  [self displayCurrentLocationAtDefaultZoom];
+//  [self performSelector:@selector(centerMapOnCurrentLocation) withObject:self afterDelay:1];
 }
 
 
@@ -99,7 +101,8 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (IBAction)currentLocationButtonTapped:(UIButton *)sender {
-  [self displayCurrentLocationAtDefaultZoom];
+  [self centerMapOnCurrentLocation];
+//  [self displayCurrentLocationAtDefaultZoom];
 //  int radius = 100;
 //  [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
 //                       andLongitude:currentLocation.coordinate.longitude
@@ -141,13 +144,20 @@ const int METERS_PER_MILE = 1609.34;
     UNIJsonNode *body = response.body;
     NSData *rawBody = response.rawBody;
 
+    if (!rawBody) {
+      NSLog(@"NO RAW BODY __ NETWORK SHAT ITSELF");
+      return;
+    }
+
     NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:rawBody
                                                              options:kNilOptions
                                                                error:nil];
     NSArray *truckStops = jsonDict[@"truckStops"];
-    NSLog(@"Number of truck stops: %lu", (unsigned long)[truckStops count]);
+    NSUInteger numTruckStops = [truckStops count];
+    NSLog(@"Number of truck stops: %lu", numTruckStops);
 
-    if ([truckStops count] > 0) {
+    if (numTruckStops > 0) {
+      NSLog(@"Adding annotations");
       for (NSDictionary *truckStop in truckStops) {
         NSString *title = [NSString stringWithFormat:@"%@", truckStop[@"name"]];
         CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([truckStop[@"lat"] doubleValue],
@@ -156,7 +166,10 @@ const int METERS_PER_MILE = 1609.34;
                                                                        Location:coordinate];
         point.subtitle = [NSString stringWithFormat:@"%@, %@", truckStop[@"city"], truckStop[@"state"]];
         point.address = [NSString stringWithFormat:@"%@\n%@", truckStop[@"rawLine1"], truckStop[@"rawLine2"]];
-        [self.mapView addAnnotation:point];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.mapView addAnnotation:point];
+        });
+
       }
     }
   }];
@@ -165,31 +178,37 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (void)getCurrentLocation {
-  locationManager.delegate = self;
-  locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-
-  [locationManager startUpdatingLocation];
+//  locationManager.delegate = self;
+//  locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+//
+//  [locationManager startUpdatingLocation];
 }
 
 - (void)displayCurrentLocationAtDefaultZoom {
   NSLog(@"displayCurrentLocationAtDefaultZoom");
+
+
+
   CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
                                                                  currentLocation.coordinate.longitude);
-  MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 160000, 160000)];
+  MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 400000, 400000)];
   [self.mapView setRegion:adjustedRegion animated:YES];
   int radius = 100;
   [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
                        andLongitude:currentLocation.coordinate.longitude
                   withRadiusInMiles:radius];
+}
 
-//  const double DEFAULT_MAP_SIZE = 200;
-//
-//  CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
-//                                                                       currentLocation.coordinate.longitude);
-//  self.mapView.camera.altitude = 160000;
-//  [self.mapView setCenterCoordinate:centerCoordinate animated:YES];
-//  MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(currentLocation.coordinate, milesToMeters(DEFAULT_MAP_SIZE), milesToMeters(DEFAULT_MAP_SIZE));
-//  [self.mapView setRegion:region animated:YES];
+- (void)centerMapOnLocation:(CLLocation *)location withZoomRadius:(double)radius {
+  MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(location.coordinate,
+                                                                 radius * 2.0,
+                                                                 radius * 2.0);
+  [self.mapView setRegion:region animated:YES];
+}
+
+- (void)centerMapOnCurrentLocation {
+  const CLLocationDistance DEFAULT_RADIUS = (CLLocationDistance)milesToMeters(100.0);
+  [self centerMapOnLocation:currentLocation withZoomRadius:DEFAULT_RADIUS];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -208,6 +227,7 @@ const int METERS_PER_MILE = 1609.34;
     currentTrackingMode = kTrackingOn;
   }
 }
+
 
 #pragma mark - MKMapViewDelegate
 
@@ -229,16 +249,7 @@ const int METERS_PER_MILE = 1609.34;
   }
 
   // Limit user to the United States and Canada
-  const double NORTHERNMOST_LATITUDE = 72.0;    // Northern edge of Alaska
-  const double SOUTHERNMOST_LATITUDE = 24.0;    // Key West
-  const double WESTERNMOST_LONGITUDE = -179.0;  // Aleutian islands
-  const double EASTERNMOST_LONGITUDE = -50.0;   // Newfoundland
-
-  if ((mapView.centerCoordinate.latitude  > NORTHERNMOST_LATITUDE) ||
-      (mapView.centerCoordinate.latitude  < SOUTHERNMOST_LATITUDE) ||
-      (mapView.centerCoordinate.longitude < WESTERNMOST_LONGITUDE) ||
-      (mapView.centerCoordinate.longitude > EASTERNMOST_LONGITUDE)) {
-    NSLog(@"Repositioning camera");
+  if ([self isOutsideContinentalUSAndCanada:mapView.centerCoordinate]) {
     if (lastKnownCenterCoordinate.latitude != 0.0 && lastKnownCenterCoordinate.longitude != 0.0) {
       [mapView setRegion:lastKnownRegion animated:YES];
     } else {
@@ -246,24 +257,41 @@ const int METERS_PER_MILE = 1609.34;
     }
   }
 
-  float largestMapViewSpan;
-  if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) {
-    largestMapViewSpan = metersToMiles([self mapViewLatitudeInMeters:mapView]);
-  } else {
-    largestMapViewSpan = metersToMiles([self mapViewLongitudeInMeters:mapView]);
-  }
-  if (largestMapViewSpan < 1.0) {
-    largestMapViewSpan = 1.0;
-  }
-  int radius = (int)round(largestMapViewSpan);
+  int radius = (int)round([self largestMapViewSpan]);
   [self getTruckStopDataForLatitude:mapView.centerCoordinate.latitude
                        andLongitude:mapView.centerCoordinate.longitude
                   withRadiusInMiles:radius];
+
+  lastKnownCenterCoordinate = mapView.centerCoordinate;
+  lastKnownRegion = mapView.region;
 
   if (currentTrackingMode == kTrackingTemporarilyOff) {
     [self performSelector:@selector(centerMap) withObject:self afterDelay:5];
     currentTrackingMode = kTrackingOn;
   }
+}
+
+- (BOOL)isOutsideContinentalUSAndCanada:(CLLocationCoordinate2D)coordinate {
+  // Limit user to the United States and Canada
+  const double NORTHERNMOST_LATITUDE = 72.0;    // Northern edge of Alaska
+  const double SOUTHERNMOST_LATITUDE = 24.0;    // Key West
+  const double WESTERNMOST_LONGITUDE = -179.0;  // Aleutian islands
+  const double EASTERNMOST_LONGITUDE = -50.0;   // Newfoundland
+
+  return ((coordinate.latitude  > NORTHERNMOST_LATITUDE) ||
+          (coordinate.latitude  < SOUTHERNMOST_LATITUDE) ||
+          (coordinate.longitude < WESTERNMOST_LONGITUDE) ||
+          (coordinate.longitude > EASTERNMOST_LONGITUDE));
+}
+
+- (double)largestMapViewSpan {
+  double result;
+  if (UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) {
+    result = metersToMiles([self mapViewLatitudeInMeters:self.mapView]);
+  } else {
+    result = metersToMiles([self mapViewLongitudeInMeters:self.mapView]);
+  }
+  return result;
 }
 
 - (int)mapViewLatitudeInMeters:(MKMapView *)mapView {
@@ -346,19 +374,80 @@ const int METERS_PER_MILE = 1609.34;
   }
 }
 
+
 #pragma mark - CLLocationManagerDelegate
+
+- (void)checkLocationAuthorizationStatus {
+  if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+    self.mapView.showsUserLocation = YES;
+  } else {
+    [locationManager requestWhenInUseAuthorization];
+  }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+  if (status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse) {
+    [manager startUpdatingLocation];
+  } else {
+    UIAlertController *alertController =
+      [UIAlertController alertControllerWithTitle:@"Location services off"
+                                          message:@"To re-enable, please go to Settings and turn on Location Service for this app."
+                                   preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {}];
+    [alertController addAction:defaultAction];
+    [self presentViewController:alertController animated:YES completion:nil];
+  }
+}
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
   NSLog(@"locationManager:didFailWithError:");
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+  NSLog(@"didUpdateLocations");
   currentLocation = locations.lastObject;
+  if (firstRun) {
+    [self centerMapOnCurrentLocation];
+    firstRun = NO;
+  }
 }
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation {
 
 }
+
+
+#pragma mark - Internet
+
+- (void)testInternetConnection
+{
+  networkReachableDetector = [Reachability reachabilityWithHostname:@"www.appleiphonecell.com"];
+
+  // Internet is reachable
+  networkReachableDetector.reachableBlock = ^(Reachability *reach)
+  {
+    // Update the UI on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+      NSLog(@"Yayyy, we have the interwebs!");
+    });
+  };
+
+  // Internet is not reachable
+  networkReachableDetector.unreachableBlock = ^(Reachability *reach)
+  {
+    // Update the UI on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+      NSLog(@"Someone broke the internet :(");
+    });
+  };
+
+  [networkReachableDetector startNotifier];
+}
+
+
+#pragma mark - Utility
 
 double milesToMeters(double miles) {
   return miles * METERS_PER_MILE;
@@ -369,4 +458,3 @@ double metersToMiles(double meters) {
 }
 
 @end
-

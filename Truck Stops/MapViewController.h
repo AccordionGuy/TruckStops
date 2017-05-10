@@ -9,10 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "Reachability.h"
 
 
-@interface MapViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate>
-
-
+@interface MapViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate> {
+  Reachability *networkReachableDetector;
+}
 @end
 
