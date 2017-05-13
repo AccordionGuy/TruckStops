@@ -66,8 +66,16 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Map" id="Qtk-cE-Ntt">
-                        <barButtonItem key="leftBarButtonItem" title="Tracking off" id="RcH-in-JgV"/>
-                        <barButtonItem key="rightBarButtonItem" systemItem="search" id="sTB-CI-0b8"/>
+                        <barButtonItem key="leftBarButtonItem" title="Tracking off" id="RcH-in-JgV">
+                            <connections>
+                                <action selector="trackingButtonTapped:" destination="BYZ-38-t0r" id="7bM-XB-awU"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="search" id="sTB-CI-0b8">
+                            <connections>
+                                <action selector="searchButtonTapped:" destination="BYZ-38-t0r" id="hxA-Ub-3is"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="fz3-BY-tdM" id="2T5-Dm-rUn"/>
