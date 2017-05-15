@@ -16,7 +16,6 @@
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *viewSelector;
 @property (weak, nonatomic) IBOutlet UIButton *currentLocationButton;
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 @end
 
@@ -30,7 +29,6 @@ const int METERS_PER_MILE = 1609.34;
 
 @implementation MapViewController {
   CLLocationManager *locationManager;
-
   CLLocation *currentLocation;
   MKCoordinateRegion lastKnownRegion;
   CLLocationCoordinate2D lastKnownCenterCoordinate;
@@ -38,10 +36,8 @@ const int METERS_PER_MILE = 1609.34;
   NSTimer *trackingDelayTimer;
   TrackingMode currentTrackingMode;
 
-  bool isInTrackingMode;
-  bool userIsReadingDetails;
-
-  BOOL firstRun;
+  BOOL userIsReadingDetails;
+  BOOL appJustStarted;
   BOOL touchDetected;
 
   NSUserDefaults *userDefaults;
@@ -50,18 +46,27 @@ const int METERS_PER_MILE = 1609.34;
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  NSLog(@"ViewDidLoad");
-
-  firstRun = true;
+  appJustStarted = YES;
   touchDetected = NO;
-  [self testInternetConnection];
+  userIsReadingDetails = NO;
+  userDefaults = [NSUserDefaults standardUserDefaults];
 
+  [self testInternetConnection];
+  [self initializeLocationManager];
+  [self initializeUserControls];
+  [self restoreSavedTrackingMode];
+}
+
+- (void)initializeLocationManager {
   locationManager = [[CLLocationManager alloc] init];
   locationManager.delegate = self;
   [self checkLocationAuthorizationStatus];
   locationManager.desiredAccuracy = kCLLocationAccuracyBest;
   [locationManager startUpdatingLocation];
+}
 
+- (void)initializeUserControls {
+  // Initialize map view
   self.mapView.delegate = self;
   self.mapView.showsTraffic = YES;
 
@@ -76,12 +81,6 @@ const int METERS_PER_MILE = 1609.34;
   self.currentLocationButton.layer.borderColor = [UIColor whiteColor].CGColor;
   self.currentLocationButton.layer.borderWidth = 4.0f;
   self.currentLocationButton.layer.masksToBounds = YES;
-
-  [self.activityIndicator stopAnimating];
-
-  userDefaults = [NSUserDefaults standardUserDefaults];
-  [self restoreSavedTrackingMode];
-  userIsReadingDetails = NO;
 }
 
 - (void)restoreSavedTrackingMode {
@@ -116,8 +115,6 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (IBAction)trackingButtonTapped:(UIBarButtonItem *)sender {
-  NSLog(@"trackingButtonTapped");
-
   if (currentTrackingMode != kTrackingOn) {
     [self turnTrackingModeOn];
   } else {
@@ -126,11 +123,9 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (IBAction)searchButtonTapped:(UIBarButtonItem *)sender {
-  NSLog(@"Current tracking mode: %u", currentTrackingMode);
 }
 
 - (void)turnTrackingModeOn {
-  NSLog(@"Tracking ON");
   currentTrackingMode = kTrackingOn;
   [userDefaults setInteger:currentTrackingMode forKey:@"currentTrackingMode"];
   userIsReadingDetails = NO;
@@ -140,7 +135,6 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (void)turnTrackingModeOff {
-  NSLog(@"Tracking OFF");
   currentTrackingMode = kTrackingOff;
   [userDefaults setInteger:currentTrackingMode forKey:@"currentTrackingMode"];
   [self.mapView setUserTrackingMode:MKUserTrackingModeNone animated:YES];
@@ -174,8 +168,6 @@ const int METERS_PER_MILE = 1609.34;
   if (latitude == 0.0 && longitude == 0.0) {
     return;
   }
-
-  [self.activityIndicator startAnimating];
 
   NSDictionary *headers = @{
     @"Content-Type": @"application/json",
@@ -219,8 +211,6 @@ const int METERS_PER_MILE = 1609.34;
       [self addTruckStops:truckStops toMapView:self.mapView];
     }
   }];
-
-  [self.activityIndicator stopAnimating];
 }
 
 - (void)addTruckStops:(NSArray *)truckStops toMapView:(MKMapView *)mapView {
@@ -239,18 +229,7 @@ const int METERS_PER_MILE = 1609.34;
   }
 }
 
-- (void)getCurrentLocation {
-//  locationManager.delegate = self;
-//  locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-//
-//  [locationManager startUpdatingLocation];
-}
-
 - (void)displayCurrentLocationAtDefaultZoom {
-  NSLog(@"displayCurrentLocationAtDefaultZoom");
-
-
-
   CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
                                                                  currentLocation.coordinate.longitude);
   MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 400000, 400000)];
@@ -495,12 +474,12 @@ const int METERS_PER_MILE = 1609.34;
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
   NSLog(@"locationManager:didUpdateLocations");
   currentLocation = locations.lastObject;
-  if (firstRun) {
+  if (appJustStarted) {
     [self centerMapOnCurrentLocationAtDefaultZoom];
     [self getTruckStopDataForLatitude:currentLocation.coordinate.longitude
                          andLongitude:currentLocation.coordinate.latitude
                     withRadiusInMiles:100.0];
-    firstRun = NO;
+    appJustStarted = NO;
   }
 }
 
