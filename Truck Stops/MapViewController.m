@@ -43,6 +43,8 @@ const int METERS_PER_MILE = 1609.34;
 
   BOOL firstRun;
   BOOL touchDetected;
+
+  NSUserDefaults *userDefaults;
 }
 
 - (void)viewDidLoad {
@@ -77,11 +79,23 @@ const int METERS_PER_MILE = 1609.34;
 
   [self.activityIndicator stopAnimating];
 
-  // TODO: Get this values from UserDefaukts
-  [self turnTrackingModeOn];
+  userDefaults = [NSUserDefaults standardUserDefaults];
+  [self restoreSavedTrackingMode];
   userIsReadingDetails = NO;
 }
 
+- (void)restoreSavedTrackingMode {
+  if ([userDefaults objectForKey:@"currentTrackingMode"] != nil) {
+    TrackingMode savedTrackingMode = (TrackingMode)[userDefaults integerForKey:@"currentTrackingMode"];
+    if (savedTrackingMode == kTrackingOn) {
+      [self turnTrackingModeOn];
+    } else {
+      [self turnTrackingModeOff];
+    }
+  } else {
+    [self turnTrackingModeOn];
+  }
+}
 
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
@@ -118,6 +132,7 @@ const int METERS_PER_MILE = 1609.34;
 - (void)turnTrackingModeOn {
   NSLog(@"Tracking ON");
   currentTrackingMode = kTrackingOn;
+  [userDefaults setInteger:currentTrackingMode forKey:@"currentTrackingMode"];
   userIsReadingDetails = NO;
   [self.mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
   [self.trackingButton setTitle:@"Tracking on"];
@@ -127,8 +142,10 @@ const int METERS_PER_MILE = 1609.34;
 - (void)turnTrackingModeOff {
   NSLog(@"Tracking OFF");
   currentTrackingMode = kTrackingOff;
+  [userDefaults setInteger:currentTrackingMode forKey:@"currentTrackingMode"];
   [self.mapView setUserTrackingMode:MKUserTrackingModeNone animated:YES];
   [self.trackingButton setTitle:@"Tracking off"];
+  [self cancelTrackingDelayTimer];
 }
 
 - (void)startTrackingDelayTimer:(double)delay {
