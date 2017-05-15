@@ -81,6 +81,7 @@
                         <outlet property="activityIndicator" destination="fz3-BY-tdM" id="2T5-Dm-rUn"/>
                         <outlet property="currentLocationButton" destination="A3S-dh-svW" id="zfB-F8-cPT"/>
                         <outlet property="mapView" destination="nL1-ks-aut" id="itI-mF-AFa"/>
+                        <outlet property="trackingButton" destination="RcH-in-JgV" id="LRY-FG-MQt"/>
                         <outlet property="viewSelector" destination="FWr-rL-RnN" id="maK-tw-hs2"/>
                     </connections>
                 </viewController>

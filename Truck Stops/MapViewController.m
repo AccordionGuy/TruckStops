@@ -35,6 +35,7 @@ const int METERS_PER_MILE = 1609.34;
   MKCoordinateRegion lastKnownRegion;
   CLLocationCoordinate2D lastKnownCenterCoordinate;
 
+  NSTimer *trackingDelayTimer;
   TrackingMode currentTrackingMode;
 
   bool isInTrackingMode;
@@ -117,8 +118,10 @@ const int METERS_PER_MILE = 1609.34;
 - (void)turnTrackingModeOn {
   NSLog(@"Tracking ON");
   currentTrackingMode = kTrackingOn;
-  [self.mapView setUserTrackingMode:MKUserTrackingModeFollowWithHeading animated:YES];
+  userIsReadingDetails = NO;
+  [self.mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
   [self.trackingButton setTitle:@"Tracking on"];
+  [self cancelTrackingDelayTimer];
 }
 
 - (void)turnTrackingModeOff {
@@ -126,6 +129,22 @@ const int METERS_PER_MILE = 1609.34;
   currentTrackingMode = kTrackingOff;
   [self.mapView setUserTrackingMode:MKUserTrackingModeNone animated:YES];
   [self.trackingButton setTitle:@"Tracking off"];
+}
+
+- (void)startTrackingDelayTimer:(double)delay {
+  [self cancelTrackingDelayTimer];
+  trackingDelayTimer = [NSTimer scheduledTimerWithTimeInterval:delay
+                                                        target:self
+                                                      selector:@selector(turnTrackingModeOn)
+                                                      userInfo:nil
+                                                       repeats:NO];
+}
+
+- (void)cancelTrackingDelayTimer {
+  if (trackingDelayTimer) {
+    [trackingDelayTimer invalidate];
+    trackingDelayTimer = nil;
+  }
 }
 
 - (IBAction)currentLocationButtonTapped:(UIButton *)sender {
@@ -258,9 +277,9 @@ const int METERS_PER_MILE = 1609.34;
   NSLog(@"Touches ended");
   touchDetected = NO;
   if (currentTrackingMode != kTrackingOff) {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     self.mapView.userTrackingMode = MKUserTrackingModeNone;
-    [self performSelector:@selector(turnTrackingModeOn) withObject:self afterDelay:5];
+    int delay = userIsReadingDetails ? 15 : 5;
+    [self startTrackingDelayTimer:delay];
   }
 }
 
@@ -301,9 +320,8 @@ const int METERS_PER_MILE = 1609.34;
   if (touchDetected) {
     touchDetected = NO;
     if (currentTrackingMode != kTrackingOff) {
-      [NSObject cancelPreviousPerformRequestsWithTarget:self];
       self.mapView.userTrackingMode = MKUserTrackingModeNone;
-      [self performSelector:@selector(turnTrackingModeOn) withObject:self afterDelay:5];
+      [self startTrackingDelayTimer:5];
     }
   }
 }
@@ -419,10 +437,10 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
+  NSLog(@"didSelectAnnotationView");
   if (currentTrackingMode != kTrackingOff) {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    userIsReadingDetails = YES;
     self.mapView.userTrackingMode = MKUserTrackingModeNone;
-    [self performSelector:@selector(turnTrackingModeOn) withObject:self afterDelay:20];
   }
 }
 
