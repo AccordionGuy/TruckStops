@@ -2,11 +2,11 @@
 
 I could *tell* you what this app does, but I can do even better — I can *show* you:
 
-!["Truck Stops" demo video](https://img.youtube.com/vi/6tHGYhKCx7o/0.jpg)(https://www.youtube.com/watch?v= 6tHGYhKCx7o)
+!["Truck Stops" demo video](https://img.youtube.com/vi/6tHGYhKCx7o/0.jpg)
 
 ## Table of contents
 
-* [The story behind the app](The story behind the app)
+* [The story behind the app](#the-story-behind-the-app)
 * [Installation](installation)
 * [Usage](usage)
 * [License](license)
