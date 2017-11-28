@@ -1,0 +1,6 @@
+framework module Pods_Truck_Stops {
+  umbrella header "Pods-Truck Stops-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,12 @@
+PODS:
+  - Unirest (1.1.4)
+
+DEPENDENCIES:
+  - Unirest (~> 1.1.4)
+
+SPEC CHECKSUMS:
+  Unirest: 5e4d93eaf32463bf619a4ecd3bbc8c32acf21eac
+
+PODFILE CHECKSUM: 07ca627a163ae15c1c4c609c07eb0648ee171d7e
+
+COCOAPODS: 1.2.1

@@ -35,9 +35,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>NSLocationAlwaysUsageDescription message goes here</string>
+	<string>This would allow this app to display your current location on the map.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>NSLocationWhenInUseUsageDescription message goes here</string>
+	<string>This would allow this app to display your current location on the map.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

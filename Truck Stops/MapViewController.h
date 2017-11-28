@@ -15,5 +15,13 @@
 @interface MapViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate> {
   Reachability *networkReachableDetector;
 }
+
+- (void)changeSearchMode;
+
+@property (copy, nonatomic) NSString *searchName;
+@property (copy, nonatomic) NSString *searchCity;
+@property (copy, nonatomic) NSString *searchState;
+@property (copy, nonatomic) NSString *searchZip;
+
 @end
 

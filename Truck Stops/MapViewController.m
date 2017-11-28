@@ -9,12 +9,15 @@
 #import "MapViewController.h"
 #import "UNIRest.h"
 #import "TruckStopAnnotation.h"
+#import "SearchViewController.h"
+#import "SecureConstants.h"
 
 @interface MapViewController ()
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *trackingButton;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *viewSelector;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *resultsSelector;
 @property (weak, nonatomic) IBOutlet UIButton *currentLocationButton;
 
 @end
@@ -36,24 +39,39 @@ const int METERS_PER_MILE = 1609.34;
   NSTimer *trackingDelayTimer;
   TrackingMode currentTrackingMode;
 
+  BOOL useSearchCriteria;
+
   BOOL userIsReadingDetails;
+  BOOL userIsBackFromSearch;
+  BOOL networkInterruptionNoticeGiven;
+
+  BOOL appHasBeenRunBefore;
   BOOL appJustStarted;
+
   BOOL touchDetected;
 
   NSUserDefaults *userDefaults;
 }
 
+
+#pragma mark - Setup and view events
+
 - (void)viewDidLoad {
   [super viewDidLoad];
 
   appJustStarted = YES;
+  appHasBeenRunBefore = ![self isFirstRun];
+
   touchDetected = NO;
   userIsReadingDetails = NO;
+  userIsBackFromSearch = NO;
+  networkInterruptionNoticeGiven = NO;
   userDefaults = [NSUserDefaults standardUserDefaults];
 
   [self testInternetConnection];
   [self initializeLocationManager];
   [self initializeUserControls];
+  [self initializeSearch];
   [self restoreSavedTrackingMode];
 }
 
@@ -63,6 +81,11 @@ const int METERS_PER_MILE = 1609.34;
   [self checkLocationAuthorizationStatus];
   locationManager.desiredAccuracy = kCLLocationAccuracyBest;
   [locationManager startUpdatingLocation];
+
+  if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedAlways &&
+      [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedWhenInUse) {
+    [self displayLocationInterruptionNotice];
+  }
 }
 
 - (void)initializeUserControls {
@@ -70,7 +93,7 @@ const int METERS_PER_MILE = 1609.34;
   self.mapView.delegate = self;
   self.mapView.showsTraffic = YES;
 
-  // Initialize segmented control
+  // Initialize "Standard / Satellite" selector
   self.viewSelector.layer.cornerRadius = 7.0;
   self.viewSelector.layer.borderColor = [UIColor whiteColor].CGColor;
   self.viewSelector.layer.borderWidth = 2.0f;
@@ -81,24 +104,142 @@ const int METERS_PER_MILE = 1609.34;
   self.currentLocationButton.layer.borderColor = [UIColor whiteColor].CGColor;
   self.currentLocationButton.layer.borderWidth = 4.0f;
   self.currentLocationButton.layer.masksToBounds = YES;
+
+  // Initialize "Show all stops / Search results only" selector
+  self.resultsSelector.selectedSegmentIndex = 0;
+  self.resultsSelector.layer.cornerRadius = 7.0;
+  self.resultsSelector.layer.borderColor = [UIColor whiteColor].CGColor;
+  self.resultsSelector.layer.borderWidth = 2.0f;
+  self.resultsSelector.layer.masksToBounds = YES;
 }
 
-- (void)restoreSavedTrackingMode {
-  if ([userDefaults objectForKey:@"currentTrackingMode"] != nil) {
-    TrackingMode savedTrackingMode = (TrackingMode)[userDefaults integerForKey:@"currentTrackingMode"];
-    if (savedTrackingMode == kTrackingOn) {
-      [self turnTrackingModeOn];
-    } else {
-      [self turnTrackingModeOff];
-    }
+- (void)initializeSearch {
+  useSearchCriteria = NO;
+  self.searchName = @"";
+  self.searchCity = @"";
+  self.searchState = @"";
+  self.searchZip = @"";
+}
+
+- (BOOL)isFirstRun {
+  if ([userDefaults objectForKey:@"appHasBeenRunBefore"] != nil) {
+    [userDefaults setBool:YES forKey:@"appHasBeenRunBefore"];
+    return true;
   } else {
-    [self turnTrackingModeOn];
+    return false;
   }
 }
 
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
 }
+
+
+#pragma mark - Truck stop map pins
+
+- (void)getTruckStopDataForLatitude:(double)latitude
+                       andLongitude:(double)longitude
+                  withRadiusInMiles:(int)radius {
+  if (latitude == 0.0 && longitude == 0.0) {
+    return;
+  }
+
+  NSDictionary *headers = @{
+    @"Content-Type": @"application/json",
+    @"Authorization": BASIC_AUTH_STRING
+  };
+
+  NSString *formattedLat = [NSString stringWithFormat:@"%f", latitude];
+  NSString *formattedLng = [NSString stringWithFormat:@"%f", longitude];
+  NSLog(@"formattedLat: %@ - formattedLng: %@", formattedLat, formattedLng);
+  NSDictionary *parameters = @{
+    @"lat": formattedLat,
+    @"lng": formattedLng
+  };
+  NSString *urlString = [NSString stringWithFormat:API_URL_STRING, radius];
+  NSLog(@"urlString: %@", urlString);
+
+  [[UNIRest post:^(UNISimpleRequest *request) {
+    [request setUrl:urlString];
+    [request setHeaders:headers];
+    [request setParameters:parameters];
+  }] asJsonAsync:^(UNIHTTPJsonResponse* response, NSError *error) {
+    // This is the asynchronous callback block
+    NSInteger code = response.code;
+    NSDictionary *responseHeaders = response.headers;
+    UNIJsonNode *body = response.body;
+    NSData *rawBody = response.rawBody;
+
+    if (!rawBody) {
+      if (!networkInterruptionNoticeGiven) {
+        [self displayNetworkInterruptionNotice];
+        networkInterruptionNoticeGiven = ![self.navigationController.visibleViewController isKindOfClass:[UIAlertController class]];
+      }
+      return;
+    }
+
+    NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:rawBody
+                                                             options:kNilOptions
+                                                               error:nil];
+    NSArray *truckStops = jsonDict[@"truckStops"];
+    if (useSearchCriteria) {
+      truckStops = [self filterUsingSearchCriteria:truckStops];
+    }
+
+    NSUInteger numTruckStops = [truckStops count];
+
+    if (numTruckStops > 0) {
+      [self addTruckStops:truckStops toMapView:self.mapView];
+    }
+  }];
+}
+
+- (NSArray *)filterUsingSearchCriteria:(NSArray *)truckStops {
+  NSLog(@"searchState: %@", self.searchState);
+  NSMutableArray *searchPredicates = [NSMutableArray array];
+
+  if (self.searchName.length > 0) {
+    NSPredicate *namePredicate = [NSPredicate predicateWithFormat:@"%K CONTAINS[cd] %@", @"name", self.searchName];
+    [searchPredicates addObject:namePredicate];
+  }
+
+  if (self.searchCity.length > 0) {
+    NSPredicate *cityPredicate = [NSPredicate predicateWithFormat:@"%K = %@", @"city", self.searchCity];
+    [searchPredicates addObject:cityPredicate];
+  }
+
+  if (self.searchState.length > 0) {
+    NSPredicate *statePredicate = [NSPredicate predicateWithFormat:@"%K = %@", @"state", self.searchState];
+    [searchPredicates addObject:statePredicate];
+  }
+
+  if (self.searchZip.length > 0) {
+    NSPredicate *zipPredicate = [NSPredicate predicateWithFormat:@"%K = %@", @"zip", self.searchZip];
+    [searchPredicates addObject:zipPredicate];
+  }
+
+  NSCompoundPredicate *searchPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:searchPredicates];
+  return [truckStops filteredArrayUsingPredicate:searchPredicate];
+}
+
+- (void)addTruckStops:(NSArray *)truckStops toMapView:(MKMapView *)mapView {
+  NSLog(@"Adding annotations");
+  for (NSDictionary *truckStop in truckStops) {
+    NSString *title = [NSString stringWithFormat:@"%@", truckStop[@"name"]];
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([truckStop[@"lat"] doubleValue],
+                                                                   [truckStop[@"lng"] doubleValue]);
+    TruckStopAnnotation *point = [[TruckStopAnnotation alloc] initWithTitle:title
+                                                                   Location:coordinate];
+    point.subtitle = [NSString stringWithFormat:@"%@, %@", truckStop[@"city"], truckStop[@"state"]];
+    point.address = [NSString stringWithFormat:@"%@\n%@", truckStop[@"rawLine1"], truckStop[@"rawLine2"]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [mapView addAnnotation:point];
+    });
+  }
+}
+
+
+#pragma mark - Map positioning and rendering
 
 - (IBAction)userChangedMapView:(UISegmentedControl *)sender {
   switch (sender.selectedSegmentIndex) {
@@ -114,6 +255,55 @@ const int METERS_PER_MILE = 1609.34;
   }
 }
 
+- (IBAction)currentLocationButtonTapped:(UIButton *)sender {
+  if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedAlways &&
+      [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedWhenInUse) {
+    [self displayLocationInterruptionNotice];
+  } else {
+    [self centerMapOnCurrentLocationAtDefaultZoom];
+  }
+}
+
+- (void)displayCurrentLocationAtDefaultZoom {
+  CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
+                                                                 currentLocation.coordinate.longitude);
+  MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 400000, 400000)];
+  [self.mapView setRegion:adjustedRegion animated:YES];
+  int radius = 100;
+  [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
+                       andLongitude:currentLocation.coordinate.longitude
+                  withRadiusInMiles:radius];
+}
+
+- (void)centerMapOnCurrentLocationAtDefaultZoom {
+  const CLLocationDistance DEFAULT_RADIUS = (CLLocationDistance)milesToMeters(100.0);
+  MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(currentLocation.coordinate,
+                                                                 DEFAULT_RADIUS * 2.0,
+                                                                 DEFAULT_RADIUS * 2.0);
+  [self.mapView setRegion:region animated:YES];
+}
+
+- (void)centerMap {
+    NSLog(@"centerMap");
+    [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
+}
+
+
+#pragma mark - Tracking mode
+
+- (void)restoreSavedTrackingMode {
+  if ([userDefaults objectForKey:@"currentTrackingMode"] != nil) {
+    TrackingMode savedTrackingMode = (TrackingMode)[userDefaults integerForKey:@"currentTrackingMode"];
+    if (savedTrackingMode == kTrackingOn) {
+      [self turnTrackingModeOn];
+    } else {
+      [self turnTrackingModeOff];
+    }
+  } else {
+    [self turnTrackingModeOn];
+  }
+}
+
 - (IBAction)trackingButtonTapped:(UIBarButtonItem *)sender {
   if (currentTrackingMode != kTrackingOn) {
     [self turnTrackingModeOn];
@@ -122,13 +312,11 @@ const int METERS_PER_MILE = 1609.34;
   }
 }
 
-- (IBAction)searchButtonTapped:(UIBarButtonItem *)sender {
-}
-
 - (void)turnTrackingModeOn {
   currentTrackingMode = kTrackingOn;
   [userDefaults setInteger:currentTrackingMode forKey:@"currentTrackingMode"];
   userIsReadingDetails = NO;
+  userIsBackFromSearch = NO;
   [self.mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
   [self.trackingButton setTitle:@"Tracking on"];
   [self cancelTrackingDelayTimer];
@@ -158,105 +346,54 @@ const int METERS_PER_MILE = 1609.34;
   }
 }
 
-- (IBAction)currentLocationButtonTapped:(UIButton *)sender {
-  [self centerMapOnCurrentLocationAtDefaultZoom];
-}
-
-- (void)getTruckStopDataForLatitude:(double)latitude
-                       andLongitude:(double)longitude
-                  withRadiusInMiles:(int)radius {
-  if (latitude == 0.0 && longitude == 0.0) {
-    return;
-  }
-
-  NSDictionary *headers = @{
-    @"Content-Type": @"application/json",
-    @"Authorization": @"Basic amNhdGFsYW5AdHJhbnNmbG8uY29tOnJMVGR6WmdVTVBYbytNaUp6RlIxTStjNmI1VUI4MnFYcEVKQzlhVnFWOEF5bUhaQzdIcjVZc3lUMitPTS9paU8="
-  };
-
-  NSString *formattedLat = [NSString stringWithFormat:@"%f", latitude];
-  NSString *formattedLng = [NSString stringWithFormat:@"%f", longitude];
-  NSLog(@"formattedLat: %@ - formattedLng: %@", formattedLat, formattedLng);
-  NSDictionary *parameters = @{
-    @"lat": formattedLat,
-    @"lng": formattedLng
-  };
-  NSString *urlString = [NSString stringWithFormat:@"http://webapp.transflodev.com/svc1.transflomobile.com/api/v3/stations/%d", radius];
-  NSLog(@"urlString: %@", urlString);
-
-  [[UNIRest post:^(UNISimpleRequest *request) {
-    [request setUrl:urlString];
-    [request setHeaders:headers];
-    [request setParameters:parameters];
-  }] asJsonAsync:^(UNIHTTPJsonResponse* response, NSError *error) {
-    // This is the asyncronous callback block
-    NSInteger code = response.code;
-    NSDictionary *responseHeaders = response.headers;
-    UNIJsonNode *body = response.body;
-    NSData *rawBody = response.rawBody;
-
-    if (!rawBody) {
-      NSLog(@"NO RAW BODY __ NETWORK SHAT ITSELF");
-      return;
-    }
-
-    NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:rawBody
-                                                             options:kNilOptions
-                                                               error:nil];
-    NSArray *truckStops = jsonDict[@"truckStops"];
-    NSUInteger numTruckStops = [truckStops count];
-    NSLog(@"Number of truck stops: %lu", numTruckStops);
-
-    if (numTruckStops > 0) {
-      [self addTruckStops:truckStops toMapView:self.mapView];
-    }
-  }];
-}
-
-- (void)addTruckStops:(NSArray *)truckStops toMapView:(MKMapView *)mapView {
-  NSLog(@"Adding annotations");
-  for (NSDictionary *truckStop in truckStops) {
-    NSString *title = [NSString stringWithFormat:@"%@", truckStop[@"name"]];
-    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([truckStop[@"lat"] doubleValue],
-                                                                   [truckStop[@"lng"] doubleValue]);
-    TruckStopAnnotation *point = [[TruckStopAnnotation alloc] initWithTitle:title
-                                                                   Location:coordinate];
-    point.subtitle = [NSString stringWithFormat:@"%@, %@", truckStop[@"city"], truckStop[@"state"]];
-    point.address = [NSString stringWithFormat:@"%@\n%@", truckStop[@"rawLine1"], truckStop[@"rawLine2"]];
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [mapView addAnnotation:point];
-    });
-  }
-}
-
-- (void)displayCurrentLocationAtDefaultZoom {
-  CLLocationCoordinate2D startCoord = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude,
-                                                                 currentLocation.coordinate.longitude);
-  MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:MKCoordinateRegionMakeWithDistance(startCoord, 400000, 400000)];
-  [self.mapView setRegion:adjustedRegion animated:YES];
-  int radius = 100;
-  [self getTruckStopDataForLatitude:currentLocation.coordinate.latitude
-                       andLongitude:currentLocation.coordinate.longitude
-                  withRadiusInMiles:radius];
-}
-
-- (void)centerMapOnCurrentLocationAtDefaultZoom {
-  const CLLocationDistance DEFAULT_RADIUS = (CLLocationDistance)milesToMeters(100.0);
-  MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(currentLocation.coordinate,
-                                                                 DEFAULT_RADIUS * 2.0,
-                                                                 DEFAULT_RADIUS * 2.0);
-  [self.mapView setRegion:region animated:YES];
-}
-
-- (void)centerMap {
-    NSLog(@"centerMap");
-    [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
-}
-
 - (void)centerMapAndTurnTrackingOn {
   [self centerMap];
   currentTrackingMode = kTrackingOn;
 }
+
+
+#pragma mark - Search
+
+- (void)changeSearchMode {
+  userIsBackFromSearch = YES;
+  [self.resultsSelector setSelectedSegmentIndex:1];
+  [self userChangedSearchMode:self.resultsSelector];
+
+  if (currentTrackingMode != kTrackingOff) {
+    self.mapView.userTrackingMode = MKUserTrackingModeNone;
+    [self startTrackingDelayTimer:30];
+  }
+}
+
+- (IBAction)userChangedSearchMode:(UISegmentedControl *)sender {
+  switch (sender.selectedSegmentIndex) {
+    case 0:
+      useSearchCriteria = NO;
+      break;
+    case 1:
+      useSearchCriteria = YES;
+      [self.mapView removeAnnotations:self.mapView.annotations];
+      break;
+    default:
+      useSearchCriteria = NO;
+      break;
+  }
+
+  int radius = (int)round([self largestMapViewSpan]);
+  [self getTruckStopDataForLatitude:self.mapView.centerCoordinate.latitude
+                       andLongitude:self.mapView.centerCoordinate.longitude
+                  withRadiusInMiles:radius];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  if ([segue.identifier isEqual: @"SearchParms"]) {
+    SearchViewController *searchViewController = [segue destinationViewController];
+    searchViewController.delegate = self;
+  }
+}
+
+
+#pragma mark - Touch response
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
   NSLog(@"Touches began");
@@ -274,13 +411,15 @@ const int METERS_PER_MILE = 1609.34;
   touchDetected = NO;
   if (currentTrackingMode != kTrackingOff) {
     self.mapView.userTrackingMode = MKUserTrackingModeNone;
-    int delay = userIsReadingDetails ? 15 : 5;
-    [self startTrackingDelayTimer:delay];
+    if (!userIsBackFromSearch) {
+      int delay = userIsReadingDetails ? 15 : 5;
+      [self startTrackingDelayTimer:delay];
+    }
   }
 }
 
 
-#pragma mark - MKMapViewDelegate
+#pragma mark - Map view methods
 
 // Map position or zoom level changed
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
@@ -349,7 +488,7 @@ const int METERS_PER_MILE = 1609.34;
   MKCoordinateSpan span = mapView.region.span;
   CLLocationCoordinate2D center = mapView.region.center;
 
-  //get latitude in meters
+  // Get latitude in meters
   CLLocation *topEdgeCenter = [[CLLocation alloc] initWithLatitude:(center.latitude - span.latitudeDelta * 0.5) longitude:center.longitude];
   CLLocation *bottomEdgeCenter = [[CLLocation alloc] initWithLatitude:(center.latitude + span.latitudeDelta * 0.5) longitude:center.longitude];
   return [topEdgeCenter distanceFromLocation:bottomEdgeCenter];
@@ -359,7 +498,7 @@ const int METERS_PER_MILE = 1609.34;
   MKCoordinateSpan span = mapView.region.span;
   CLLocationCoordinate2D center = mapView.region.center;
 
-  //get longitude in meters
+  // Get longitude in meters
   CLLocation *leftEdgeCenter = [[CLLocation alloc] initWithLatitude:center.latitude longitude:(center.longitude - span.longitudeDelta * 0.5)];
   CLLocation *rightEdgeCenter = [[CLLocation alloc] initWithLatitude:center.latitude longitude:(center.longitude + span.longitudeDelta * 0.5)];
   return [leftEdgeCenter distanceFromLocation:rightEdgeCenter];
@@ -441,10 +580,11 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 
-#pragma mark - CLLocationManagerDelegate
+#pragma mark - Location Manager
 
 - (void)checkLocationAuthorizationStatus {
-  if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+  if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse ||
+      [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways) {
     self.mapView.showsUserLocation = YES;
   } else {
     [locationManager requestWhenInUseAuthorization];
@@ -454,17 +594,21 @@ const int METERS_PER_MILE = 1609.34;
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
   if (status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse) {
     [manager startUpdatingLocation];
-  } else {
-    UIAlertController *alertController =
-      [UIAlertController alertControllerWithTitle:@"Location services off"
-                                          message:@"To re-enable, please go to Settings and turn on Location Service for this app."
-                                   preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * action) {}];
-    [alertController addAction:defaultAction];
-    [self presentViewController:alertController animated:YES completion:nil];
+  } else if (appHasBeenRunBefore && !appJustStarted) {
+    [self displayNetworkInterruptionNotice];
   }
+}
+
+- (void)displayLocationInterruptionNotice {
+  UIAlertController *alertController =
+  [UIAlertController alertControllerWithTitle:@"Location services off"
+                                      message:@"This app can still display truck stops, but can’t display your current location with location services disabled.\nTo re-enable them, please go to Settings and turn on Location Service for this app."
+                               preferredStyle:UIAlertControllerStyleAlert];
+  UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * action) {}];
+  [alertController addAction:defaultAction];
+  [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
@@ -484,34 +628,61 @@ const int METERS_PER_MILE = 1609.34;
 }
 
 
-#pragma mark - Internet
+#pragma mark - Internet connection
 
 - (void)testInternetConnection {
   networkReachableDetector = [Reachability reachabilityWithHostname:@"www.appleiphonecell.com"];
+
+  // It’s a bad idea to use “self” inside a block,
+  // so let’s create references to self that
+  // we’re certain will not be retained.
+  __block MapViewController *blockSafeSelf = self;
+  __block BOOL noticeGiven = networkInterruptionNoticeGiven;
 
   // Internet is reachable
   networkReachableDetector.reachableBlock = ^(Reachability *reach)
   {
     // Update the UI on the main thread
     dispatch_async(dispatch_get_main_queue(), ^{
-      NSLog(@"Yayyy, we have the interwebs!");
+      NSLog(@"Connected!");
     });
+    networkInterruptionNoticeGiven = NO;
   };
 
   // Internet is not reachable
   networkReachableDetector.unreachableBlock = ^(Reachability *reach)
   {
-    // Update the UI on the main thread
-    dispatch_async(dispatch_get_main_queue(), ^{
-      NSLog(@"Someone broke the internet :(");
-    });
+    if (!noticeGiven) {
+      // Update the UI on the main thread
+      dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Connection down!");
+        [blockSafeSelf displayNetworkInterruptionNotice];
+      });
+
+      // Is another alert is currently being shown, the “No connection” alert will be blocked,
+      // so *DON’T* mark it down as having been shown.
+      NSLog(@"networkInterruptionNoticeGiven: %d", [blockSafeSelf.navigationController.visibleViewController isKindOfClass:[UIAlertController class]]);
+      networkInterruptionNoticeGiven = ![blockSafeSelf.navigationController.visibleViewController isKindOfClass:[UIAlertController class]];
+    }
   };
 
   [networkReachableDetector startNotifier];
 }
 
+- (void)displayNetworkInterruptionNotice {
+  UIAlertController *alertController =
+  [UIAlertController alertControllerWithTitle:@"Network connection lost"
+                                      message:@"This app can’t display truck stop information until the network connection is restored."
+                               preferredStyle:UIAlertControllerStyleAlert];
+  UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * action) {}];
+  [alertController addAction:defaultAction];
+  [self presentViewController:alertController animated:YES completion:nil];
+}
 
-#pragma mark - Utility
+
+#pragma mark - Conversion functions
 
 double milesToMeters(double miles) {
   return miles * METERS_PER_MILE;
@@ -522,4 +693,3 @@ double metersToMiles(double meters) {
 }
 
 @end
-

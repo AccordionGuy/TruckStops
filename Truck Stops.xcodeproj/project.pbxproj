@@ -19,6 +19,8 @@
 		D428D55E1EBD63CC00EFB043 /* TruckStopAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = D428D55D1EBD63CC00EFB043 /* TruckStopAnnotation.m */; };
 		D44A16E21EC0151500369214 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44A16E11EC0151500369214 /* SystemConfiguration.framework */; };
 		D44A16E81EC0165400369214 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = D44A16E71EC0165400369214 /* Reachability.m */; };
+		D45B0BD11EE6409F00E0F610 /* SecureConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = D45B0BD01EE6409F00E0F610 /* SecureConstants.m */; };
+		D4A81B7C1ED7D5CC00F14CA2 /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D4A81B7B1ED7D5CC00F14CA2 /* SearchViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +43,10 @@
 		D44A16E11EC0151500369214 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		D44A16E61EC0165400369214 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		D44A16E71EC0165400369214 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		D45B0BD01EE6409F00E0F610 /* SecureConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecureConstants.m; sourceTree = "<group>"; };
+		D45B0BD21EE640C100E0F610 /* SecureConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecureConstants.h; sourceTree = "<group>"; };
+		D4A81B7A1ED7D5CC00F14CA2 /* SearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
+		D4A81B7B1ED7D5CC00F14CA2 /* SearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
 		F8633173E122F93B819589E5 /* Pods-Truck Stops.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Truck Stops.release.xcconfig"; path = "Pods/Target Support Files/Pods-Truck Stops/Pods-Truck Stops.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -93,15 +99,19 @@
 				D428D53F1EB971D300EFB043 /* AppDelegate.m */,
 				D428D5411EB971D300EFB043 /* MapViewController.h */,
 				D428D5421EB971D300EFB043 /* MapViewController.m */,
+				D4A81B7A1ED7D5CC00F14CA2 /* SearchViewController.h */,
+				D4A81B7B1ED7D5CC00F14CA2 /* SearchViewController.m */,
 				D428D55C1EBD63CC00EFB043 /* TruckStopAnnotation.h */,
 				D428D55D1EBD63CC00EFB043 /* TruckStopAnnotation.m */,
+				D44A16E61EC0165400369214 /* Reachability.h */,
+				D44A16E71EC0165400369214 /* Reachability.m */,
+				D45B0BD21EE640C100E0F610 /* SecureConstants.h */,
+				D45B0BD01EE6409F00E0F610 /* SecureConstants.m */,
 				D428D5441EB971D300EFB043 /* Main.storyboard */,
 				D428D54A1EB971D300EFB043 /* Assets.xcassets */,
 				D428D54C1EB971D300EFB043 /* LaunchScreen.storyboard */,
 				D428D54F1EB971D300EFB043 /* Info.plist */,
 				D428D53B1EB971D300EFB043 /* Supporting Files */,
-				D44A16E61EC0165400369214 /* Reachability.h */,
-				D44A16E71EC0165400369214 /* Reachability.m */,
 			);
 			path = "Truck Stops";
 			sourceTree = "<group>";
@@ -249,9 +259,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D428D5431EB971D300EFB043 /* MapViewController.m in Sources */,
+				D45B0BD11EE6409F00E0F610 /* SecureConstants.m in Sources */,
 				D428D5401EB971D300EFB043 /* AppDelegate.m in Sources */,
 				D428D55E1EBD63CC00EFB043 /* TruckStopAnnotation.m in Sources */,
 				D428D53D1EB971D300EFB043 /* main.m in Sources */,
+				D4A81B7C1ED7D5CC00F14CA2 /* SearchViewController.m in Sources */,
 				D44A16E81EC0165400369214 /* Reachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
