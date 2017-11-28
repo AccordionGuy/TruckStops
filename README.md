@@ -2,7 +2,9 @@
 
 I could *tell* you what this app does, but I can do even better — I can *show* you:
 
-!["Truck Stops" demo video](https://img.youtube.com/vi/6tHGYhKCx7o/0.jpg)
+![Still image from TruckStops demo video](http://www.globalnerdy.com/wordpress/wp-content/uploads/2017/11/truck-stop-video-still.jpg)
+
+[Click here to watch the demo video.](https://www.youtube.com/watch?v=6tHGYhKCx7o)
 
 ## Table of contents
 
